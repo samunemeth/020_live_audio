@@ -1,0 +1,18 @@
+{
+  "name": "live-audio",
+  "version": "1.0.0",
+  "description": "For transmitting live audio from a client to a server with a socket connection.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "speaker": "^0.5.5",
+    "wav": "^1.0.2",
+    "wav-encoder": "^1.3.0"
+  }
+}
