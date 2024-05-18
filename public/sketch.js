@@ -44,11 +44,7 @@ stopRecording.onclick = function () {
     recordAudio.stopRecording(() => {
         recordAudio.getDataURL(() => {
             const audioBlob = recordAudio.getBlob();
-            const data = {
-                blob: audioBlob,
-                type: audioBlob.type || 'audio/wav'
-            };
-            socket.emit('audio-file', data);
+            socket.emit('audio-file', audioBlob);
         });
     });
 };

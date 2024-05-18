@@ -17,14 +17,12 @@ io.on('connection', (socket) => {
     console.log('New client connected');
 
     // Getting a new audio file
-    socket.on('audio-file', (data) => {
+    socket.on('audio-file', (audioBlob) => {
 
         console.log('Audio data received...')
 
         // Get data and save it to a file
-        const blob = data.blob
-        const format = data.type.split('/')[1];
-        fs.writeFileSync(`./received/${Date.now()}.${format}`, blob);
+        fs.writeFileSync(`./received/${Date.now()}.wav`, audioBlob);
 
         console.log('Audio data saved!')
     });
