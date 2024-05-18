@@ -14,22 +14,20 @@ app.use(express.static('public'));
 
 // On new socket connection
 io.on('connection', (socket) => {
-    console.log('New client connected');
+    console.log('> Client connected.');
 
     // Getting a new audio file
     socket.on('audio-file', (audioBlob) => {
 
-        console.log('Audio data received...')
-
         // Get data and save it to a file
         fs.writeFileSync(`./received/${Date.now()}.wav`, audioBlob);
 
-        console.log('Audio data saved!')
+        console.log('> Audio data received and saved.');
     });
 
     // On disconnect
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        console.log('> Client disconnected.');
     });
 });
 
