@@ -1,9 +1,11 @@
 // Getting DOM elements
 const startButton = document.getElementById('start');
 const stopButton = document.getElementById('stop');
-const playButton = document.getElementById('play');
+const replayButton = document.getElementById('replay');
 const deleteButton = document.getElementById('delete');
 const sendButton = document.getElementById('send');
+
+const statusText = document.getElementById('status');
 
 // Create global variables
 let recordAudio;
@@ -13,13 +15,31 @@ let currentAudioBlob;
 function resetButtons() {
     startButton.disabled = false;
     stopButton.disabled = true;
-    playButton.disabled = true;
+    replayButton.disabled = true;
     deleteButton.disabled = true;
     sendButton.disabled = true;
 }
 resetButtons();
 
-// When the start button is clicked
+
+/*
+    HANDLE SOCKET CONNECTION
+*/
+
+socket.on('connect', () => {
+    statusText.innerText = 'Connected';
+});
+
+socket.on('disconnect', () => {
+    statusText.innerText = 'Disconnected';
+});
+
+
+/* 
+    HANDLE BUTTON CLICKS
+*/
+
+
 startButton.addEventListener('click', () => {
 
     // Visual adjustment
@@ -27,7 +47,7 @@ startButton.addEventListener('click', () => {
 
     // Start the audio recording
     navigator.getUserMedia({ audio: true }, (stream) => {
-        
+
         // TODO: What is exactly going on here? Figure out the correct starting parameters!
         recordAudio = RecordRTC(stream, {
             type: 'audio',
@@ -45,7 +65,6 @@ startButton.addEventListener('click', () => {
     });
 }, false);
 
-// When the stop button is clicked
 stopButton.addEventListener('click', () => {
 
     // Visual adjustment
@@ -56,16 +75,16 @@ stopButton.addEventListener('click', () => {
         currentAudioBlob = recordAudio.getBlob();
 
         // Visual adjustment
-        playButton.disabled = false;
+        replayButton.disabled = false;
         deleteButton.disabled = false;
         sendButton.disabled = false;
     });
 }, false);
 
-playButton.addEventListener('click', () => {
+replayButton.addEventListener('click', () => {
 
     // Visual adjustment
-    playButton.disabled = true;
+    replayButton.disabled = true;
     deleteButton.disabled = true;
     sendButton.disabled = true;
 
@@ -81,7 +100,7 @@ playButton.addEventListener('click', () => {
     audioPlayer.onended = () => {
 
         // Visual adjustment
-        playButton.disabled = false;
+        replayButton.disabled = false;
         deleteButton.disabled = false;
         sendButton.disabled = false;
 
