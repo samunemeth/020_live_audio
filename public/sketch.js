@@ -1,22 +1,34 @@
 // Getting DOM elements
-const startRecording = document.getElementById('start-recording');
-const stopRecording = document.getElementById('stop-recording');
+const startButton = document.getElementById('start');
+const stopButton = document.getElementById('stop');
+const playButton = document.getElementById('play');
+const deleteButton = document.getElementById('delete');
+const sendButton = document.getElementById('send');
 
+// Create global variables
 let recordAudio;
+let currentAudioBlob;
 
 // Visual adjustment
-startRecording.disabled = false;
+function resetButtons() {
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    playButton.disabled = true;
+    deleteButton.disabled = true;
+    sendButton.disabled = true;
+}
+resetButtons();
 
 // When the start button is clicked
-startRecording.onclick = function () {
+startButton.addEventListener('click', () => {
 
     // Visual adjustment
-    startRecording.disabled = true;
+    startButton.disabled = true;
 
     // Start the audio recording
-    navigator.getUserMedia({
-        audio: true
-    }, function (stream) {
+    navigator.getUserMedia({ audio: true }, (stream) => {
+        
+        // TODO: What is exactly going on here? Figure out the correct starting parameters!
         recordAudio = RecordRTC(stream, {
             type: 'audio',
             sampleRate: 44100,
@@ -26,25 +38,73 @@ startRecording.onclick = function () {
         recordAudio.startRecording();
 
         // Visual adjustment
-        stopRecording.disabled = false;
+        stopButton.disabled = false;
 
-    }, function (error) {
+    }, (error) => {
         console.error(JSON.stringify(error));
     });
-};
+}, false);
 
 // When the stop button is clicked
-stopRecording.onclick = function () {
+stopButton.addEventListener('click', () => {
 
     // Visual adjustment
-    startRecording.disabled = false;
-    stopRecording.disabled = true;
+    stopButton.disabled = true;
 
     // Stop the audio recording
     recordAudio.stopRecording(() => {
-        recordAudio.getDataURL(() => {
-            const audioBlob = recordAudio.getBlob();
-            socket.emit('audio-file', audioBlob);
-        });
+        currentAudioBlob = recordAudio.getBlob();
+
+        // Visual adjustment
+        playButton.disabled = false;
+        deleteButton.disabled = false;
+        sendButton.disabled = false;
     });
-};
+}, false);
+
+playButton.addEventListener('click', () => {
+
+    // Visual adjustment
+    playButton.disabled = true;
+    deleteButton.disabled = true;
+    sendButton.disabled = true;
+
+    // Create audio player
+    let audioPlayer = new Audio();
+    let AudioURL = URL.createObjectURL(currentAudioBlob);
+    audioPlayer.src = AudioURL;
+
+    // Start the playback
+    audioPlayer.play();
+
+    // Free memory when finished
+    audioPlayer.onended = () => {
+
+        // Visual adjustment
+        playButton.disabled = false;
+        deleteButton.disabled = false;
+        sendButton.disabled = false;
+
+        URL.revokeObjectURL(AudioURL);
+        audioPlayer.remove();
+    };
+}, false);
+
+deleteButton.addEventListener('click', () => {
+
+    // Delete the recorded audio
+    currentAudioBlob = undefined;
+
+    // Visual adjustment
+    resetButtons();
+}, false);
+
+sendButton.addEventListener('click', () => {
+
+    // Send audio to the server
+    socket.emit('audio-file', currentAudioBlob);
+    currentAudioBlob = undefined;
+
+    // Visual adjustment
+    resetButtons();
+}, false);
