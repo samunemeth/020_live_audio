@@ -8,7 +8,7 @@ const sendButton = document.getElementById('send');
 const statusText = document.getElementById('status');
 
 // Create global variables
-let recordAudio;
+let audioRecorder;
 let currentAudioBlob;
 
 // Visual adjustment
@@ -45,17 +45,17 @@ startButton.addEventListener('click', () => {
     // Visual adjustment
     startButton.disabled = true;
 
-    // Start the audio recording
+    // Get the audio stream from the user
     navigator.getUserMedia({ audio: true }, (stream) => {
 
-        // TODO: What is exactly going on here? Figure out the correct starting parameters!
-        recordAudio = RecordRTC(stream, {
-            type: 'audio',
+        // Create a new audio recorder
+        audioRecorder = new StereoAudioRecorder(stream, {
             sampleRate: 44100,
-            recorderType: StereoAudioRecorder,
-            numberOfAudioChannels: 1
+            bufferSize: 4096,
+            numberOfAudioChannels: 1,
+            disableLogs: true
         });
-        recordAudio.startRecording();
+        audioRecorder.record();
 
         // Visual adjustment
         stopButton.disabled = false;
@@ -70,9 +70,9 @@ stopButton.addEventListener('click', () => {
     // Visual adjustment
     stopButton.disabled = true;
 
-    // Stop the audio recording
-    recordAudio.stopRecording(() => {
-        currentAudioBlob = recordAudio.getBlob();
+    // Stop the audio recording and save the data
+    audioRecorder.stop((blob) => {
+        currentAudioBlob = blob;
 
         // Visual adjustment
         replayButton.disabled = false;
