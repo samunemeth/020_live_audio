@@ -3,6 +3,9 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const { exec } = require('child_process');
+
+const FFPLAY_COMMAND = "ffplay -v 0 -nodisp -autoexit"
 
 // Initialization
 const app = express();
@@ -19,10 +22,17 @@ io.on('connection', (socket) => {
     // Getting a new audio file
     socket.on('audio-file', (audioBlob) => {
 
+        const current_file_name = Date.now();
+
         // Get data and save it to a file
-        fs.writeFileSync(`./received/${Date.now()}.wav`, audioBlob);
+        fs.writeFileSync(`./received/${current_file_name}.wav`, audioBlob);
 
         console.log('> Audio data received and saved.');
+
+        exec(`${FFPLAY_COMMAND} ./received/${current_file_name}.wav`, () => {});
+
+        console.log('> Audio started playing.')
+
     });
 
     // On disconnect
