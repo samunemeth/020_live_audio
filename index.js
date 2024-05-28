@@ -22,6 +22,7 @@ io.on('connection', (socket) => {
     // Getting a new audio file
     socket.on('audio-file', (audioBlob) => {
 
+        // Get current time for the file name
         const current_file_name = Date.now();
 
         // Get data and save it to a file
@@ -29,6 +30,7 @@ io.on('connection', (socket) => {
 
         console.log('> Audio data received and saved.');
 
+        // Play the file with ffplay
         exec(`${FFPLAY_COMMAND} ./received/${current_file_name}.wav`, () => {});
 
         console.log('> Audio started playing.')
@@ -42,4 +44,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, '127.0.0.1', () => console.log(`Server running on port ${PORT}`));
